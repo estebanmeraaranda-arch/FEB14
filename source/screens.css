@@ -1,0 +1,114 @@
+/* ===== IMPORTAR FUENTES ===== */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap");
+
+/* ===== VARIABLES DE COLOR ===== */
+:root {
+  --color-red: #ec1840;
+  --color-purple: #7a18ec;
+  --color-white: #fff;
+  --speed-normal: 0.5s;
+  --speed-fast: 0.8s;
+}
+
+/* ===== SISTEMA DE SCREENS ===== */
+
+#screen1, #screen2 {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  display: none;
+  z-index: 10;
+}
+
+#screen1.active, #screen2.active {
+  display: flex;
+}
+
+#screen2.active {
+  display: block;
+}
+
+/* SCREEN 1: MENÚ CON BOTONES */
+#screen1 {
+  background-color: #000;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: center;
+  position: relative;
+  z-index: 30; /* ensure buttons are above fireworks canvas */
+}
+
+/* BOTONES CON ESTILOS DE boton.css */
+.btn-menu {
+  position: relative;
+  width: 180px;
+  height: 60px;
+  margin: 20px;
+  line-height: 60px;
+  letter-spacing: 2px;
+  text-decoration: none;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--color-white);
+  transition: var(--speed-normal);
+  border: 1px solid var(--color-red);
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  z-index: 31;
+}
+
+.btn-menu:hover {
+  border: 1px solid transparent;
+  background: var(--color-red) url(https://i.postimg.cc/wBXGXbWN/pixel.png);
+  transition-delay: 0.8s;
+  background-size: 180px;
+  animation: animate var(--speed-fast) steps(8) forwards;
+}
+
+.btn-menu:nth-child(2) {
+  border: 1px solid var(--color-purple);
+}
+
+.btn-menu:nth-child(2):hover {
+  background: var(--color-purple) url(https://i.postimg.cc/FzBWFtKM/pixel2.png);
+}
+
+@keyframes animate {
+  0% {
+    background-position-y: 0;
+  }
+  100% {
+    background-position-y: -480px;
+  }
+}
+
+/* SCREEN 2: JUEGO */
+#screen2 {
+  display: none;
+  position: relative;
+  z-index: 10;
+}
+
+#screen2.active {
+  display: block;
+}
+
+#game {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}

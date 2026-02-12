@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mini Juego Isla</title>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="source/screens.css">
+  <link rel="stylesheet" href="fireworks.css">
+  <link rel="stylesheet" href="source/styles.css">
+  <link rel="stylesheet" href="source/collisions/collisions.css">
+  <link rel="stylesheet" href="source/dialogo/dialogo.css">
+
+</head>
+<body>
+
+  <!-- SCREEN 1: MENÚ INICIAL -->
+  <div id="screen1" class="active">
+    <canvas id="fireworks-canvas"></canvas>
+    <div class="buttons-container">
+      <button class="btn-menu" onclick="startGame()">INICIAR</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: JUEGO -->
+  <div id="screen2">
+    <div id="game">
+      <div id="water"></div>
+
+      <div id="world">
+        <!-- jugador y colisiones se inyectan por JS -->
+      </div>
+    </div>
+
+    <!-- Diálogo -->
+    <div class="stardew-box">
+      <p id="text-content"></p>
+      <div id="next-arrow" class="arrow hidden">▼</div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="source/Musica/music.js"></script>
+  <script src="fireworks.js"></script>
+  <script src="source/screens.js"></script>
+  <script src="source/collisions/collisions.js"></script>
+  <script src="source/dialogo/cupon.js"></script>
+  <script src="source/dialogo/dialogo.js"></script>
+  <script src="source/player/player.js"></script>
+  <script src="source/zorrito/zorrito.js"></script>
+  <script src="source/main.js"></script>
+  <script src="source/sand.js"></script>
+
+</body>
+</html>
+
