@@ -32,7 +32,7 @@ function showCupones() {
   cuponesContainer.id = 'cupones-container';
   cuponesContainer.style.position = 'fixed';
   cuponesContainer.style.zIndex = '1001';
-  cuponesContainer.style.pointer = 'cursor';
+  cuponesContainer.style.cursor = 'pointer';
   document.body.appendChild(cuponesContainer);
   
   // Arreglo de cupones
@@ -129,3 +129,6 @@ function hideCupones() {
   // Remover listener
   window.removeEventListener('keydown', closeCuponesOnEsc);
 }
+
+// Exponer en window para poder abrir cupones desde consola u otros scripts
+window.showCupones = showCupones;

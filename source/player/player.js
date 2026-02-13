@@ -7,15 +7,32 @@ const player = {
   direction: "down",
   frameIndex: 0,
   frameTimer: 0,
-  frameSpeed: 5
+  frameSpeed: 10
 };
 
 // Sprites organizados por dirección
+// Format: index 0 = imagen estática; siguientes = frames de caminata
 const sprites = {
-  down: ['source/player/Estatico.png'],
-  up: ['source/player/Arriba2.png', 'source/player/Arriba1.png'],
-  left: ['source/player/Izq1.png', 'source/player/Izq3.png', 'source/player/Izq2.png'],
-  right: ['source/player/Der1.png', 'source/player/Der3.png', 'source/player/Der2.png']
+  down: [
+    'source/player/reposo1.png',
+    'source/player/8.png',
+    'source/player/reposo2.png'
+  ],
+  up: [
+    'source/player/arribaestatico1.png',
+    'source/player/arriba1.png'
+  ],
+  left: [
+    'source/player/camina2izqestatico.png',
+    'source/player/caminar3izq.png',
+    'source/player/caminar2izq.png',
+    'source/player/caminar1izq.png'
+  ],
+  right: [
+    'source/player/camina2derestatico.png',
+    'source/player/caminar3der.png',
+    'source/player/caminar2der.png'
+  ]
 };
 
 const playerEl = document.createElement("div");
@@ -24,7 +41,7 @@ playerEl.id = "player";
 playerEl.style.position = "absolute";
 playerEl.style.width = player.size + "px";
 playerEl.style.height = player.size + "px";
-playerEl.style.backgroundImage = "url('source/player/Estatico.png')";
+playerEl.style.backgroundImage = `url('${sprites.down[0]}')`;
 playerEl.style.backgroundSize = "contain";
 playerEl.style.backgroundPosition = "center";
 playerEl.style.backgroundRepeat = "no-repeat";
@@ -108,7 +125,7 @@ function updatePlayer() {
 
 function updateAnimation() {
   const directionSprites = sprites[player.direction];
-  
+
   if (player.isMoving && directionSprites.length > 1) {
     // Cambiar entre frames de caminata
     player.frameTimer++;
@@ -118,6 +135,7 @@ function updateAnimation() {
     }
   } else {
     // Sprite estático o si solo hay una imagen
+    // Mantener frame estático correspondiente a la última dirección conocida
     player.frameIndex = 0;
   }
   
@@ -211,25 +229,42 @@ window.addEventListener('keydown', e => {
 
 function triggerRedZone() {
   console.log('Red zone triggered!');
-  // El overlay en showCupones() se encarga del blur
-  // Mostrar cupones
-  showCupones();
+  // Blurrar la playa (agua)
+  const water = document.getElementById('water');
+  water.style.filter = 'blur(5px)';
+  // TODO: mostrar PNG desconocido aquí
 }
 
 function triggerGreenZone() {
   console.log('Green zone triggered!');
-  // Animar zorrito con flores (últimas 3 imágenes: image_0008, image_0009, image_0010)
+  // Animar zorrito con flores: usar la lista real de archivos (incluye sufijos a)
   const zFloresSprites = [
-    'source/zorrito/zorrito flores/image_0008.png',
-    'source/zorrito/zorrito flores/image_0009.png',
-    'source/zorrito/zorrito flores/image_0010.png'
+    'source/zorrito/zorrito flores/3.png',
+    'source/zorrito/zorrito flores/4.png',
+    'source/zorrito/zorrito flores/5.png',
+    'source/zorrito/zorrito flores/6.png',
+    'source/zorrito/zorrito flores/7.png',
+    'source/zorrito/zorrito flores/8.png',
+    'source/zorrito/zorrito flores/9.png',
+    'source/zorrito/zorrito flores/10.png',
+    'source/zorrito/zorrito flores/11a.png',
+    'source/zorrito/zorrito flores/12a.png',
+    'source/zorrito/zorrito flores/13a.png',
+    'source/zorrito/zorrito flores/14a.png',
+    'source/zorrito/zorrito flores/15a.png',
+    'source/zorrito/zorrito flores/16a.png',
+    'source/zorrito/zorrito flores/17a.png'
   ];
-  
-  // Cambiar sprite del zorrito a animación flores
-  window.zorrito.data.florMode = true;
-  window.zorrito.data.florSprites = zFloresSprites;
-  window.zorrito.data.florFrameIndex = 0;
-  window.zorrito.data.florFrameTimer = 0;
+
+  // Cambiar sprite del zorrito a animación flores y reiniciar contadores
+  if (window.zorrito && window.zorrito.data) {
+    window.zorrito.data.florMode = true;
+    window.zorrito.data.florSprites = zFloresSprites;
+    window.zorrito.data.florFrameIndex = 0;
+    window.zorrito.data.florFrameTimer = 0;
+    window.zorrito.data.tailIndex = 0;
+    window.zorrito.data.florPhase = 'full';
+  }
 }
 
 updatePlayer();
