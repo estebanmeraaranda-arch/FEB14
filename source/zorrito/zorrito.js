@@ -44,10 +44,10 @@ const zorritoSprites = [
   'source/zorrito/zorrito reposo/2.png'
 ];
 
-// Frames específicos para bucle final (15a y 16a)
+// Frames específicos para bucle final (15 y 16)
 const zorritoTailFrames = [
-  'source/zorrito/zorrito flores/15a.png',
-  'source/zorrito/zorrito flores/16a.png'
+  'source/zorrito/zorrito flores/15.png',
+  'source/zorrito/zorrito flores/16.png'
 ];
 
 // Secuencia completa de flores (usar nombres reales en disco). Si se agregan

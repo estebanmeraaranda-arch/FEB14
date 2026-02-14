@@ -16,7 +16,7 @@ const dialogs = [
     image: "source/dialogo/personaje dialogo/2.png"
   },
   {
-    text: "Que lo disfrutes, porque lo hice pensando en ti <3",
+    text: "Que lo disfrutes, porque lo hice pensando en ti, te quiero <3",
     image: "source/dialogo/personaje dialogo/1.png"
   }
 ];

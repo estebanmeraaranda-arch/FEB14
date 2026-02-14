@@ -4,10 +4,18 @@
 let cuponesAbiertos = false;
 
 function showCupones() {
-  if (cuponesAbiertos) return; // Evitar abrir múltiples veces
+  if (cuponesAbiertos) return;
   cuponesAbiertos = true;
   
-  // Crear overlay de desenfoque (borra TODO excepto cupones)
+  console.log('showCupones called');
+  
+  const screen2 = document.getElementById('screen2');
+  if (!screen2) {
+    console.warn('screen2 no encontrado');
+    return;
+  }
+  
+  // Crear overlay dentro de screen2
   const overlay = document.createElement('div');
   overlay.id = 'cupones-overlay';
   overlay.style.position = 'fixed';
@@ -17,117 +25,91 @@ function showCupones() {
   overlay.style.height = '100vh';
   overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
   overlay.style.backdropFilter = 'blur(10px)';
-  overlay.style.zIndex = '998';
+  overlay.style.zIndex = '9995';
   overlay.style.pointerEvents = 'auto';
   overlay.style.cursor = 'pointer';
-  document.body.appendChild(overlay);
+  screen2.appendChild(overlay);
   
-  // Cerrar cupones si clikeas el overlay
-  overlay.addEventListener('click', () => {
-    hideCupones();
-  });
+  overlay.addEventListener('click', hideCupones);
   
-  // Crear contenedor de cupones
-  const cuponesContainer = document.createElement('div');
-  cuponesContainer.id = 'cupones-container';
-  cuponesContainer.style.position = 'fixed';
-  cuponesContainer.style.zIndex = '1001';
-  cuponesContainer.style.cursor = 'pointer';
-  document.body.appendChild(cuponesContainer);
-  
-  // Arreglo de cupones
-  const cuponesData = [
-    {
-      id: 'cupon-1',
-      src: 'source/cupón/1.png',
-      left: '18%',
-      top: '30%',
-      width: '300px',
-      height: '300px'
-    },
-    {
-      id: 'cupon-2',
-      src: 'source/cupón/2.png',
-      left: '38%',
-      top: '14%',
-      width: '300px',
-      height: '300px'
-    },
-    {
-      id: 'cupon-3',
-      src: 'source/cupón/3.png',
-      left: '57%',
-      top: '30%',
-      width: '300px',
-      height: '300px'
-    }
+  // Preparar datos de sprites
+  const sprites = [
+    'source/cupones/1.png',
+    'source/cupones/2.png',
+    'source/cupones/3.png'
   ];
-  
-  // Crear cada cupón
-  cuponesData.forEach(cupon => {
+
+  // Centrados absolutamente y tamaño aumentado
+  const cuponW = 320; // width en px
+  const cuponH = 320; // height en px
+  const gap = 20;
+  const totalW = cuponW * 3 + gap * 2;
+  const startX = Math.max(8, Math.round(window.innerWidth / 2 - totalW / 2));
+  const startY = Math.max(8, Math.round(window.innerHeight / 2 - cuponH / 2));
+
+  sprites.forEach((src, idx) => {
     const cuponEl = document.createElement('div');
-    cuponEl.id = cupon.id;
-    cuponEl.className = 'cupon';
+    const id = 'cupon-' + (idx + 1);
+    cuponEl.id = id;
     cuponEl.style.position = 'fixed';
-    cuponEl.style.backgroundImage = `url('${cupon.src}')`;
+    cuponEl.style.width = cuponW + 'px';
+    cuponEl.style.height = cuponH + 'px';
+    cuponEl.style.left = (startX + idx * (cuponW + gap)) + 'px';
+    cuponEl.style.top = startY + 'px';
+    cuponEl.style.backgroundImage = `url('${src}')`;
     cuponEl.style.backgroundSize = 'contain';
     cuponEl.style.backgroundPosition = 'center';
     cuponEl.style.backgroundRepeat = 'no-repeat';
-    cuponEl.style.width = cupon.width;
-    cuponEl.style.height = cupon.height;
-    cuponEl.style.left = cupon.left;
-    cuponEl.style.top = cupon.top;
     cuponEl.style.cursor = 'pointer';
-    cuponEl.style.transition = 'transform 0.3s ease, filter 0.3s ease';
-    cuponEl.style.pointerEvents = 'auto'; // Cupones sí responden a clicks
-    
-    // Animación hover
+    cuponEl.style.zIndex = '9999';
+    cuponEl.style.transition = 'transform 0.2s, filter 0.2s';
+    cuponEl.style.pointerEvents = 'auto';
+
     cuponEl.addEventListener('mouseenter', () => {
-      cuponEl.style.transform = 'scale(1.15) rotate(5deg)';
-      cuponEl.style.filter = 'drop-shadow(0 0 20px rgba(255, 215, 0, 0.8))';
+      cuponEl.style.transform = 'scale(1.08) rotate(3deg)';
+      cuponEl.style.filter = 'drop-shadow(0 0 20px rgba(255,200,0,0.85))';
     });
-    
+
     cuponEl.addEventListener('mouseleave', () => {
-      cuponEl.style.transform = 'scale(1) rotate(0deg)';
-      cuponEl.style.filter = 'drop-shadow(0 0 0px rgba(255, 215, 0, 0))';
+      cuponEl.style.transform = 'scale(1) rotate(0)';
+      cuponEl.style.filter = 'none';
     });
-    
-    // Click en cupón
+
     cuponEl.addEventListener('click', (e) => {
-      e.stopPropagation(); // Evitar que se active el overlay click
-      console.log(`Cupón ${cupon.id} seleccionado`);
+      e.stopPropagation();
+      console.log(`Cupón ${id} seleccionado`);
       hideCupones();
     });
-    
-    cuponesContainer.appendChild(cuponEl);
+
+    screen2.appendChild(cuponEl);
   });
   
-  // Cerrar cupones con ESC
-  window.addEventListener('keydown', closeCuponesOnEsc);
-}
-
-function closeCuponesOnEsc(event) {
-  if (event.key === 'Escape') {
-    hideCupones();
-  }
+  // Listener para ESC
+  const closeOnEsc = (e) => {
+    if (e.key === 'Escape') hideCupones();
+  };
+  window.addEventListener('keydown', closeOnEsc);
+  window._closeOnEsc = closeOnEsc;
 }
 
 function hideCupones() {
-  const container = document.getElementById('cupones-container');
+  // Remover overlay
   const overlay = document.getElementById('cupones-overlay');
+  if (overlay) overlay.remove();
   
-  if (container) {
-    container.remove();
-  }
-  
-  if (overlay) {
-    overlay.remove();
-  }
+  // Remover cupones
+  ['cupon-1', 'cupon-2', 'cupon-3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  });
   
   cuponesAbiertos = false;
   
-  // Remover listener
-  window.removeEventListener('keydown', closeCuponesOnEsc);
+  // Remover listener ESC
+  if (window._closeOnEsc) {
+    window.removeEventListener('keydown', window._closeOnEsc);
+    window._closeOnEsc = null;
+  }
 }
 
 // Exponer en window para poder abrir cupones desde consola u otros scripts

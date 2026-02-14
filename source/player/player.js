@@ -1,12 +1,14 @@
 const player = {
   x: 0,
   y: 0,
-  size: 64,
+  size: 140,
   speed: 4,
   isMoving: false,
   direction: "down",
+  facing: "down",
   frameIndex: 0,
   frameTimer: 0,
+  _lastIsMoving: null,
   frameSpeed: 10
 };
 
@@ -86,6 +88,9 @@ function isColliding(nx, ny) {
 }
 
 function updatePlayer() {
+  const prevX = player.x;
+  const prevY = player.y;
+
   let nextX = player.x;
   let nextY = player.y;
 
@@ -117,6 +122,11 @@ function updatePlayer() {
   playerEl.style.left = `calc(50% + ${player.x}px)`;
   playerEl.style.top  = `calc(50% + ${player.y}px)`;
 
+  // si la posición REAL cambió (comparando con prev), actualizar la cara/facing
+  if (player.x !== prevX || player.y !== prevY) {
+    player.facing = player.direction;
+  }
+
   updateAnimation();
   checkInteractiveZone();
 
@@ -124,22 +134,48 @@ function updatePlayer() {
 }
 
 function updateAnimation() {
-  const directionSprites = sprites[player.direction];
+  const useDir = player.isMoving ? player.direction : (player.facing || player.direction);
+  const directionSprites = sprites[useDir] || [];
 
-  if (player.isMoving && directionSprites.length > 1) {
-    // Cambiar entre frames de caminata
-    player.frameTimer++;
-    if (player.frameTimer >= player.frameSpeed) {
-      player.frameIndex = (player.frameIndex + 1) % directionSprites.length;
-      player.frameTimer = 0;
-    }
-  } else {
-    // Sprite estático o si solo hay una imagen
-    // Mantener frame estático correspondiente a la última dirección conocida
+  // Detectar cambio entre movimiento/quieto para reiniciar índices
+  if (player._lastIsMoving !== player.isMoving) {
     player.frameIndex = 0;
+    player.frameTimer = 0;
+    player._lastIsMoving = player.isMoving;
   }
-  
-  playerEl.style.backgroundImage = `url('${directionSprites[player.frameIndex]}')`;
+
+  if (!player.isMoving) {
+    // Si hay frames que contienen 'estatico' o 'reposo' en el nombre, recorrer sólo esos
+    const staticSprites = directionSprites.filter(s => /estatico|reposo/i.test(s));
+    if (staticSprites.length > 0) {
+      player.frameTimer++;
+      // mostrar estáticos más lento
+      if (player.frameTimer >= player.frameSpeed * 2) {
+        player.frameIndex = (player.frameIndex + 1) % staticSprites.length;
+        player.frameTimer = 0;
+      }
+      player.frameIndex = Math.min(player.frameIndex, staticSprites.length - 1);
+      playerEl.style.backgroundImage = `url('${staticSprites[player.frameIndex]}')`;
+      return;
+    }
+
+    // si no hay imágenes con 'estatico'/'reposo', mostrar la primera imagen por defecto
+    player.frameIndex = 0;
+    playerEl.style.backgroundImage = `url('${directionSprites[0]}')`;
+    return;
+  }
+
+  // En movimiento: usar frames que NO contengan 'estatico' ni 'reposo' (si existen), sino todos
+  let walkSprites = directionSprites.filter(s => !/estatico|reposo/i.test(s));
+  if (walkSprites.length === 0) walkSprites = directionSprites.slice();
+
+  player.frameTimer++;
+  if (player.frameTimer >= player.frameSpeed) {
+    player.frameIndex = (player.frameIndex + 1) % walkSprites.length;
+    player.frameTimer = 0;
+  }
+  player.frameIndex = Math.min(player.frameIndex, walkSprites.length - 1);
+  playerEl.style.backgroundImage = `url('${walkSprites[player.frameIndex]}')`;
 }
 
 // ===== BOTONES E INDEPENDIENTES (ESTÁTICOS EN EL MAPA) =====
@@ -232,7 +268,14 @@ function triggerRedZone() {
   // Blurrar la playa (agua)
   const water = document.getElementById('water');
   water.style.filter = 'blur(5px)';
-  // TODO: mostrar PNG desconocido aquí
+  // Abrir cupones desde el botón rojo
+  if (typeof window.showCupones === 'function') {
+    try {
+      window.showCupones();
+    } catch (err) {
+      console.warn('showCupones falló en triggerRedZone:', err);
+    }
+  }
 }
 
 function triggerGreenZone() {
@@ -247,17 +290,19 @@ function triggerGreenZone() {
     'source/zorrito/zorrito flores/8.png',
     'source/zorrito/zorrito flores/9.png',
     'source/zorrito/zorrito flores/10.png',
-    'source/zorrito/zorrito flores/11a.png',
-    'source/zorrito/zorrito flores/12a.png',
-    'source/zorrito/zorrito flores/13a.png',
-    'source/zorrito/zorrito flores/14a.png',
-    'source/zorrito/zorrito flores/15a.png',
-    'source/zorrito/zorrito flores/16a.png',
-    'source/zorrito/zorrito flores/17a.png'
+    'source/zorrito/zorrito flores/11.png',
+    'source/zorrito/zorrito flores/12.png',
+    'source/zorrito/zorrito flores/13.png',
+    'source/zorrito/zorrito flores/14.png',
+    'source/zorrito/zorrito flores/15.png',
+    'source/zorrito/zorrito flores/16.png',
+    'source/zorrito/zorrito flores/17.png'
   ];
 
   // Cambiar sprite del zorrito a animación flores y reiniciar contadores
-  if (window.zorrito && window.zorrito.data) {
+  if (window.zorritoFlowers && typeof window.zorritoFlowers.play === 'function') {
+    window.zorritoFlowers.play(zFloresSprites, { frameSpeed: window.zorrito && window.zorrito.data ? window.zorrito.data.florFrameSpeed : 5 });
+  } else if (window.zorrito && window.zorrito.data) {
     window.zorrito.data.florMode = true;
     window.zorrito.data.florSprites = zFloresSprites;
     window.zorrito.data.florFrameIndex = 0;
@@ -265,6 +310,7 @@ function triggerGreenZone() {
     window.zorrito.data.tailIndex = 0;
     window.zorrito.data.florPhase = 'full';
   }
+  // Nota: los cupones se muestran desde triggerRedZone (botón rojo). Sólo animación aquí.
 }
 
 updatePlayer();
