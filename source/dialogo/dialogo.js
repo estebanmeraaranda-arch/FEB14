@@ -1,6 +1,7 @@
 const dialogs = [
+ 
   {
-    text: "Hola lindo, preparado para la sorpresa en la que llevo trabajando hace mucho :3 (preciona z para continuar)" ,
+    text: "Hola corazóm, preparado para la sorpresa en la que llevo trabajando hace mucho :3 (preciona z para continuar)" ,
     image: "source/dialogo/personaje dialogo/5.png"
   },
   {
@@ -20,9 +21,9 @@ const dialogs = [
     image: "source/dialogo/personaje dialogo/1.png"
   },
   {
-    text: "te presento a tu personaje en un intento de pixel art, te mueves con las flechas y encuentra el mensaje en la arena >:3",
+    text: "Este es tu personaje en un intento de pixel art, te mueves con las flechas y encuentra el mensaje en la arena >:3" ,
     image: "source/dialogo/personaje dialogo/FIRST.png"
-  }
+  },
 ];
 
 let currentLine = 0;
