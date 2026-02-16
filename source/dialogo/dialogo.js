@@ -18,6 +18,10 @@ const dialogs = [
   {
     text: "Que lo disfrutes, porque lo hice pensando en ti, te quiero <3",
     image: "source/dialogo/personaje dialogo/1.png"
+  },
+  {
+    text: "te presento a tu personaje en un intento de pixel art, te mueves con las flechas y encuentra el mensaje en la arena >:3",
+    image: "source/dialogo/personaje dialogo/FIRST.png"
   }
 ];
 
@@ -35,13 +39,11 @@ async function typeSentence(sentence) {
   if (arrow) arrow.classList.add('hidden');
   textElement.textContent = "";
   
-  // Mostrar imagen del diálogo
   const currentDialog = dialogs[currentLine];
-  showDialogImage(currentDialog.image);
+  showDialogImage(currentDialog.image, currentLine);
   
   for (const char of sentence) {
     textElement.textContent += char;
-    // Pequeño delay para el efecto máquina de escribir
     await new Promise(resolve => setTimeout(resolve, 40));
   }
   
@@ -49,39 +51,51 @@ async function typeSentence(sentence) {
   if (arrow) arrow.classList.remove('hidden');
 }
 
-// Mostrar imagen del personaje
-function showDialogImage(imagePath) {
-  let imageContainer = document.getElementById('dialog-image-container');
+function showDialogImage(imagePath, lineIndex) {
+  const isLast = lineIndex === dialogs.length - 1;
   
-  // Crear contenedor si no existe
-  if (!imageContainer) {
-    imageContainer = document.createElement('div');
-    imageContainer.id = 'dialog-image-container';
-    document.body.appendChild(imageContainer);
+  if (isLast) {
+    document.body.classList.add('dialog-last-image');
+    let lastContainer = document.getElementById('dialog-image-last');
+    if (!lastContainer) {
+      lastContainer = document.createElement('div');
+      lastContainer.id = 'dialog-image-last';
+      document.body.appendChild(lastContainer);
+    }
+    let image = lastContainer.querySelector('img');
+    if (!image) {
+      image = document.createElement('img');
+      lastContainer.appendChild(image);
+    }
+    image.src = imagePath;
+  } else {
+    document.body.classList.remove('dialog-last-image');
+    let imageContainer = document.getElementById('dialog-image-container');
+    if (!imageContainer) {
+      imageContainer = document.createElement('div');
+      imageContainer.id = 'dialog-image-container';
+      document.body.appendChild(imageContainer);
+    }
+    let image = imageContainer.querySelector('img');
+    if (!image) {
+      image = document.createElement('img');
+      imageContainer.appendChild(image);
+    }
+    image.src = imagePath;
   }
-  
-  // Crear o actualizar imagen
-  let image = imageContainer.querySelector('img');
-  if (!image) {
-    image = document.createElement('img');
-    imageContainer.appendChild(image);
-  }
-  
-  // Solo actualizar el src - CSS maneja la visibilidad
-  image.src = imagePath;
 }
 
 function hideDialogImage() {
+  document.body.classList.remove('dialog-last-image');
+  const lastContainer = document.getElementById('dialog-image-last');
   const imageContainer = document.getElementById('dialog-image-container');
-  if (imageContainer) {
-    // No hacer nada - el CSS controla la visibilidad basado en body.dialog-active
-  }
+  if (lastContainer) lastContainer.style.display = 'none';
+  if (imageContainer) imageContainer.style.display = 'none';
 }
 
-// Escuchar la tecla Z
 window.addEventListener('keydown', (e) => {
   if (e.key.toLowerCase() === 'z') {
-    if (isTyping) return; // Evita saltar mientras escribe
+    if (isTyping) return;
     
     const textElement = document.getElementById('text-content');
     
@@ -89,24 +103,20 @@ window.addEventListener('keydown', (e) => {
     if (currentLine < dialogs.length) {
       typeSentence(dialogs[currentLine].text);
     } else {
-      // Cerrar el diálogo
       if (!dialogBox) dialogBox = document.querySelector('.stardew-box');
       if (dialogBox) {
         dialogBox.classList.remove('active');
         document.body.classList.remove('dialog-active');
         textElement.textContent = "";
       }
-      // IMPORTANTE: Aquí NO mostramos imágenes
-      // Las imágenes solo se muestran mientras hay diálogo activo
       hideDialogImage();
       currentLine = 0;
     }
   }
 });
 
-// Iniciar primer diálogo cuando el juego comienza
 function initializeDialogs() {
-  if (dialogInitialized) return; // Evitar inicializar dos veces
+  if (dialogInitialized) return;
   dialogInitialized = true;
   
   dialogBox = document.querySelector('.stardew-box');
@@ -117,10 +127,7 @@ function initializeDialogs() {
   }
 }
 
-// Esta función será llamada desde screens.js cuando Screen 2 inicia
 function initializeGame() {
   console.log('🎮 Preparando el juego...');
-  
-  // Inicializar el resto del juego
   initializeDialogs();
 }
